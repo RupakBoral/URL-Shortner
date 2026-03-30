@@ -1,6 +1,6 @@
 # clipURL ✂️
 
-> A fast, minimal URL shortener built with Node.js, TypeScript, Redis, and Docker.
+> A fast, minimal URL shortener built with Node.js, TypeScript, Redis, Nginx and Docker.
 
 ---
 
@@ -72,7 +72,7 @@ Content-Type: application/json
 ### Redirect
 
 ```http
-GET api/v1/tiny/:id
+GET /clip/:id
 ```
 
 Redirects (`302`) to the original URL. Returns `404` if the link has expired or doesn't exist.
