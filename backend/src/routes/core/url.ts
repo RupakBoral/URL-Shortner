@@ -1,6 +1,5 @@
 import { Request, Response, Router } from "express";
 import { URLRequest } from "../../types";
-import { nanoid } from "nanoid";
 import redisClient from "../../config/redis";
 import { CONFIG } from "../../config/constants";
 import { getUniqueId } from "../../controller/generateId";
@@ -27,7 +26,7 @@ coreRouter.post('/shortner', async (req: Request, res: Response) => {
 
         const isURL = await redisClient.get(url);
         if (isURL) {
-            res.status(201).json({ success: true, message: "Yeah, URL is shorten, Enjoy!!", "body": { "short_url": `${CONFIG.URL.BASE_URL}/api/v1/tiny/${isURL}` } });
+            res.status(201).json({ success: true, message: "Yeah, URL is shorten, Enjoy!!", "body": { "short_url": `${CONFIG.URL.BASE_URL}/clip/${isURL}` } });
             return;
         }
 
@@ -39,7 +38,7 @@ coreRouter.post('/shortner', async (req: Request, res: Response) => {
         redisClient.set(url, unique_id, 'EX', expires_in || max_ttl);
 
 
-        const short_url: string = `${CONFIG.URL.BASE_URL}/api/v1/tiny/${unique_id}`;
+        const short_url: string = `${CONFIG.URL.BASE_URL}/clip/${unique_id}`;
 
         res.status(201).json({ success: true, message: "Yeah, URL is shorten, Enjoy!!", "body": { "short_url": `${short_url}` } });
 
@@ -49,28 +48,3 @@ coreRouter.post('/shortner', async (req: Request, res: Response) => {
     }
 
 });
-
-coreRouter.get('/tiny/:id', async (req: Request<{ id: string }>, res: Response) => {
-    try {
-        const unique_id = req.params.id ?? null;
-
-        if (!unique_id || unique_id.trim() === '') {
-            console.error("No id found");
-            res.status(500).json({ success: false, message: "Please provide a valid URL." });
-            return;
-        }
-
-        const url: string | null = await redisClient.get(unique_id);
-
-        if (!url || url.trim() === '') {
-            res.status(404).json({ success: false, message: 'URL not found or expired.' });
-            return;
-        }
-
-        res.redirect(url);
-
-    } catch (error) {
-        console.error("Error", error);
-        res.status(500).json({ success: false, message: "No URL mapping found, Please try again." });
-    }
-})

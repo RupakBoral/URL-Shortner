@@ -20,7 +20,7 @@ clipURL takes a long URL and returns a short, shareable link that redirects to t
 | Database | Redis |
 | Process Manager | PM2 |
 | Containerization | Docker + Docker Compose |
-| Reverse Proxy | Nginx (WIP) |
+| Reverse Proxy | Nginx |
 
 ---
 
@@ -28,11 +28,11 @@ clipURL takes a long URL and returns a short, shareable link that redirects to t
 
 - 🔗 Shorten any valid URL
 - ⏳ Custom expiry (TTL) per link
-- 🔁 Duplicate URL detection — same URL returns same short code
+- 🐬 Duplicate URL detection — same URL returns same short code
 - 🚀 Fast redirects via Redis lookup
 - 🐳 Fully containerized with Docker Compose
 - ♻️ PM2 process management inside container
-
+- 🔁 Reverse Proxy and IP based rate limiting
 ---
 
 ## API
@@ -63,7 +63,7 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "short_url": "http://localhost:8080/api/v1/tiny/a1b2c3d4"
+  "short_url": "http://localhost:80/clip/a1b2c3d4"
 }
 ```
 
@@ -83,7 +83,7 @@ Redirects (`302`) to the original URL. Returns `404` if the link has expired or 
 
 ```env
 PORT=8080
-BASE_URL=http://localhost:8080
+BASE_URL=http://localhost:80
 
 REDIS_HOST=redis
 REDIS_PORT=6379
@@ -114,18 +114,11 @@ cd clipurl
 cp .env.example .env
 
 # start all services
-docker-compose up --build
+docker-compose up -d --build
 ```
 
 ### Stop
 
 ```bash
 docker-compose down
-```
-
-### Logs
-
-```bash
-docker-compose logs app
-docker-compose logs redis
 ```
