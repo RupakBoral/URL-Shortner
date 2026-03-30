@@ -109,6 +109,7 @@ URL_TTL=86400
 # clone the repo
 git clone https://github.com/RupakBoral/clipURL.git
 cd clipurl
+cd backend
 
 # copy env
 cp .env.example .env
